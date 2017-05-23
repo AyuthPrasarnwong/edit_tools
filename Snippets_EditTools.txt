@@ -1,0 +1,148 @@
+// ---------------------------------------------------
+// Code Snippets for Exercise: Edit Tools
+// ---------------------------------------------------
+
+
+/*
+ * URLs used in this exercise
+ * 
+ * Wildfire Response Polygons layer on SampleServer6
+ *   http://sampleserver6.arcgisonline.com/arcgis/rest/services/Wildfire/FeatureServer/2
+ *
+
+
+
+// ---------------------------------------------------
+
+    /*
+     * Step: Construct the Feature layer
+     */
+     var landusePolygonLayer = new FeatureLayer("URL_to_Wildfire_Response_Polygons_layer", {
+      mode: FeatureLayer.MODE_SNAPSHOT,
+      outFields: ["*"]
+    });
+
+
+// ---------------------------------------------------
+
+    /*
+     * Step: Wire the Map's Layers Add Result event handler
+     */
+
+    //map.on("layers-add-result", initEditor);
+
+    /*
+     * Step:Add the Feature layer to the map
+     */
+
+    //map.addLayers([landusePolygonLayer]);
+
+
+    
+// ---------------------------------------------------
+      /*
+       * Step: Construct the Draw widget
+       */
+      drawToolbar = new Draw(map);
+
+      /*
+       * Step: Wire the Draw Toolbar's Draw End event handler
+       */
+      drawToolbar.on("draw-end", addToFeatureLayer);
+
+// ---------------------------------------------------
+
+
+  /*
+    * Step: Add Graphic To Feature Layer
+  */
+
+    var symbol;
+      
+    drawToolbar.deactivate();
+
+    map.showZoomSlider();
+    switch (evt.geometry.type) {
+      case "point":
+      case "multipoint":
+        symbol = new SimpleMarkerSymbol();
+        break;
+      case "polyline":
+        symbol = new SimpleLineSymbol();
+        break;
+      default:
+        symbol = new SimpleFillSymbol();
+        break;
+    }
+
+    var graphic = new Graphic(evt.geometry, symbol);
+
+    var attr = {"ruleid": 2,"name": widgetInput.get("value")};
+
+    var newGraphic = new Graphic(evt.geometry, null, attr);
+
+    landusePolygonLayer.applyEdits([newGraphic], null, null);
+
+
+// ---------------------------------------------------
+
+
+      /*
+        * Step: Construct the Edit Toolbar 
+        */
+
+        var editToolbar = new Edit(map);
+
+// ---------------------------------------------------
+
+
+      /*
+      * Step: Wire the Feature Layer's double click event handlerr 
+      */
+
+    
+      var editingEnabled = false;
+
+      featureLayer.on("dbl-click", function(evt) {
+
+          event.stop(evt);
+          if (editingEnabled === false) {
+              widgetInput.set("value", evt.graphic.attributes.name)
+              editingEnabled = true;
+              editToolbar.activate(Edit.EDIT_VERTICES , evt.graphic);
+          } else {
+              //featureLayer = this;
+              //editToolbar.deactivate();
+              editingEnabled = false;
+          }
+
+      });
+// ---------------------------------------------------
+
+
+        /*
+        * Step: Wire the Edit Toolbar's Deactivate event handler
+        */
+        editToolbar.on("deactivate", function(evt) {
+            console.log("featureLayerevt", evt);
+            featureLayer.applyEdits(null, [evt.graphic], null);
+        });
+
+// ---------------------------------------------------
+
+        /*
+        * Step: Wire the button's onclick event handler
+        */
+
+        on(widgetButton, "click", function(evt) {
+
+            editToolbar.deactivate();
+
+        });
+
+
+// ---------------------------------------------------
+
+
+
+
