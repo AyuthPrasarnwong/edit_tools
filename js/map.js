@@ -102,6 +102,8 @@ var map, toolbar, symbol, geomTask;
         var featureLayer = map.getLayer(landusePolygonLayer.id);
 
 
+
+
         /*
         * Step: Construct the Edit Toolbar 
         */
